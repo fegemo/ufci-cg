@@ -119,8 +119,8 @@ Além de implementar esses itens obrigatórios, você deve também
 [the-last-lighthouse]: https://www.crazygames.com/game/the-last-lighthouse
 
 Legenda dos ícones:
-- ⭐ Esforço médio porém muito importante
 - 🌟 Esforço baixo
+- ⭐ Esforço médio porém muito importante
 - 💣 Esforço alto, melhor correr senão explode
 - 🍔 Esforço médio mas professor adoraria ver implementado
 
