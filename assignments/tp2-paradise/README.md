@@ -111,6 +111,8 @@ Além de implementar esses itens obrigatórios, você deve também
      terceiros e carregue-os no seu programa. Um formato simples é o `.obj`
      (mas ele não suporta animação). Tem também o formato glTF (mais complexo
      mas suporta animação)
+     - Caso queira fazer sobre Pokémon mesmo, [dizem][ripped-pokemon-assets]
+       que circulam por aí os modelos 3D de vários monstrinhos de bolso
   1. ⭐ **_Skybox_, _skyphere_ ou _skydome_**: se considerarmos
      que nosso mundo está definido dentro de um cubo (_skybox_), podemos
      colocar uma imagem de textura em cada face interna (são 6) que
@@ -275,3 +277,4 @@ para fazer a aplicação.
 [skybox]: https://www.google.com.br/search?q=skybox&safe=off&hl=pt-BR&source=lnms&tbm=isch&sa=X&ei=jMM_VenRNKuasQSCwYDABw&ved=0CAgQ_AUoAg&biw=1366&bih=599
 [lighting]: http://fegemo.github.io/utf-cg/classes/lighting/#1
 [picking]: https://webgl2fundamentals.org/webgl/lessons/webgl-picking.html
+[ripped-pokemon-assets]: https://models.spriters-resource.com/nintendo_switch/pokemonscarletviolet/
