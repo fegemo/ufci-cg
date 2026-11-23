@@ -115,12 +115,12 @@
 <!-- {"layout": "regular"} -->
 # Algoritmo basicão
 
-- `pixels[] renderScene(scene)`:
+- `pixels[] renderScene(scene)`: <!-- {li:.bullet} -->
   1. Dada uma configuração de câmera, gerar um raio
      <span class="math">R_{ij}</span> que sai do olho, passando pelo centro de cada pixel
      <span class="math">(i, j)</span> da sua janela
   1. Chame `castRay(R)` e assinale a cor do pixel com a cor retornada
-- `color castRay(R, scene)`:
+- `color castRay(R, scene)`:  <!-- {li:.bullet} -->
   1. Dispara o raio <span class="math">R</span> na cena. Seja <span class="math">X</span> o 1º objeto
     atingido e <span class="math">P</span> o ponto do objeto que foi atingido
   1. Para cada fonte de luz <span class="math">L</span>:
@@ -207,7 +207,7 @@
 
 ![](../../images/raytracing-ray.png) <!-- {style="height: 200px;"} -->
 <!-- {p:.centered} -->
-- **Raio** é como uma **reta** em forma **paramétrica**:
+- **Raio** é uma **semirreta** em forma **paramétrica**:
   <span class="math">R(t) = P_0 + t(P_1 - P_0)</span>, ou seja
   <div class="math">R(t) = P_0 + t\vec{u}</div>
 - Computa-se para quais valores do parâmetro <span class="math">t</span> a
@@ -218,42 +218,55 @@
 <!-- {"layout": "regular"} -->
 # **Estrutura de dados** para representar raio
 
-- Em C:
+- <!-- {ul:.bullet} -->
+  Em C:
   ```c
   struct Ray {
-    Vector3 P;
+    Vector3 P0;
     Vector3 u;
   };
+
 
   ```
 - Em C++:
   ```cpp
   class Ray {
     public:
-    Vector3 P;
+    Vector3 P0;
     Vector3 u;
   };
+
   ```
 - Em Java:
   ```java
   public class Ray {
-    Vector3 P;
+    Vector3 P0;
     Vector3 u;
   }
 
-  ```
-  <!-- {ul:.layout-split-3.no-bullet style="justify-content: space-around"} -->
 
-E os objetos, como podemos representá-los?
+  ```
+- Em JavaScript:
+  ```javascript
+  class Ray {
+    constructor(P0, u) {
+      this.P0 = P0;
+      this.u = u;
+    }
+  }
+  ```
+  <!-- {ul:.layout-split-4.no-bullet style="justify-content: space-around"} -->
+
+E os objetos, como podemos representá-los? <!-- {p:.bullet style="align-self: flex-end;"} -->
 
 ---
 <!-- {"layout": "regular"} -->
 # Objetos implícitos
 
-- Um **objeto implícito** é dado por uma 
-  **equação da forma <span class="math">f(x, y, z) = 0</span>**
+- Um **objeto implícito** é dado por uma
+  **equação da forma <span class="math">F(x, y, z) = 0</span>**
 - Várias superfícies podem ser modeladas como objetos implícitos:
-  - Planos, círculos, triângulos (grau 1)
+  - Planos, círculos, triângulos (grau 1)  <!-- {ul^0:.bulleted} -->
     - _i.e._, <span class="math">ax + by + cz + d = 0</span>
   - Quádricas (grau 2)
     - Elipsóide: <span class="math">\frac{x^2}{a^2}+\frac{y^2}{b^2}+\frac{z^2}{c^2} = 1</span>
@@ -261,7 +274,7 @@ E os objetos, como podemos representá-los?
   - Quárticas (grau 4)
     - Toróides (_dunkin donuts_)
 
-Na vida real: triângulos 👍 <!-- {p:.note.info.centered} -->
+Na vida real: triângulos 👍 <!-- {p:.note.info.centered.bullet} -->
 
 
 ---
@@ -287,7 +300,7 @@ Na vida real: triângulos 👍 <!-- {p:.note.info.centered} -->
   unitária e está centrada na origem**: <!-- {ul:style="max-width: 70%"} -->
   <div class="math">x^2+y^2+z^2 - 1 = 0</div>
 - Raio parametrizado como:
-  <div class="math">[P_x+t\vec{u}_x \;\;\; P_y+t\vec{u}_y \;\;\; P_z+t\vec{u}_z]</div>
+  <div class="math">[P_{0x}+t\vec{u}_x \;\;\; P_{0y}+t\vec{u}_y \;\;\; P_{0z}+t\vec{u}_z]</div>
 
 **Atenção**: você NÃO vai usar esta fórmula no trabalho, porque ela serve apenas para
 esferas unitárias na origem. <!-- {p:.note.warning style="max-width: 70%; align-self: flex-start;"} -->
@@ -295,66 +308,77 @@ esferas unitárias na origem. <!-- {p:.note.warning style="max-width: 70%; align
 ---
 <!-- {"layout": "regular", "state": "show-active-slide-and-previous"} -->
 
-- Substituindo, <!-- {ul:.bulleted style="max-width: 86%; align-self: center;"} -->
-  <div class="math bullet">(P_x+t\vec{u}_x)^2 + (P_y+t\vec{u}_y)^2 + (P_z+t\vec{u}_z)^2-1=0</div>
-  <div class="math bullet" style="font-size: 80%;">(P_x^2+2P_xt\vec{u}_x+t^2\vec{u}_x^2) + (P_y^2+2P_yt\vec{u}_y+t^2\vec{u}_y^2) + (P_z^2+2P_zt\vec{u}_z+t^2\vec{u}_z^2)-1=0</div>
-  <div class="math bullet" style="font-size: 80%;">(\vec{u}_x^2+\vec{u}_y^2+\vec{u}_z^2)t^2 + 2(\vec{u}_xP_x+\vec{u}_yP_y+\vec{u}_zP_z)t + (P_x^2+P_y^2+P_z^2-1)=0</div>
+- Substituindo, <!-- {ul:style="max-width: 86%; align-self: center;"} -->
+  <div class="math bullet">(P_{0x}+t\vec{u}_x)^2 + (P_{0y}+t\vec{u}_y)^2 + (P_{0z}+t\vec{u}_z)^2-1=0</div>
+  <div class="math bullet" style="font-size: 80%;">(P_{0x}^2+2P_{0x}t\vec{u}_x+t^2\vec{u}_x^2) + (P_{0y}^2+2P_{0y}t\vec{u}_y+t^2\vec{u}_y^2) + (P_{0z}^2+2P_{0z}t\vec{u}_z+t^2\vec{u}_z^2)-1=0</div>
+  <div class="math bullet" style="font-size: 80%;">(\vec{u}_x^2+\vec{u}_y^2+\vec{u}_z^2)t^2 + 2(\vec{u}_xP_{0x}+\vec{u}_yP_{0y}+\vec{u}_zP_{0z})t + (P_{0x}^2+P_{0y}^2+P_{0z}^2-1)=0</div>
 
-  - ou
+  - ou <!-- {li:.bullet.no-bullet} -->
     - <span class="math">at^2+bt+c=0</span>
-  - ::: result .note.push-right width: 250px;
-    - <span class="math bullet">\vec{u}</span> é conhecido
-    - <span class="math bullet">P</span> é conhecido
-    - <span class="math bullet">t</span> é a variável
+  - <!-- {li:.bullet.no-bullet} -->
+    ::: result .note.info.push-right width: 250px;
+    - <!-- {li:.bullet} --> 
+      <span class="math">\vec{u}</span> é conhecido
+    - <!-- {li:.bullet} --> 
+      <span class="math">P_0</span> é conhecido
+    - <!-- {li:.bullet} --> 
+      <span class="math">t</span> é a variável
     :::
-    onde
-    - <span class="math bullet">a = \vec{u}_x^2 + \vec{u}_y^2 + \vec{u}_z^2</span>
-    - <span class="math bullet">b = 2(\vec{u}_xP_x + \vec{u}_yP_y + \vec{u}_zP_z)</span>
-    - <span class="math bullet">c = P_x^2 + P_y^2 + P_z^2 - 1</span>
+  - onde <!-- {li:.bullet.no-bullet} -->
+    - <!-- {li:.bullet} -->
+      <span class="math">a = \vec{u}_x^2 + \vec{u}_y^2 + \vec{u}_z^2</span>
+    - <!-- {li:.bullet} -->
+      <span class="math">b = 2(\vec{u}_x P_x + \vec{u}_y P_y + \vec{u}_z P_z)</span>
+    - <!-- {li:.bullet} -->
+      <span class="math">c = P_{0x}^2 + P_{0y}^2 + P_{0z}^2 - 1</span>
 - Com os **coeficientes da equação de 2º grau** (<span class="math">a, b, c</span>),
   podemos encontrar o **<span class="math">\Delta</span>** e **as raízes** (valores 
-  de <span class="math">t</span>) <!-- {li:.bullet} -->
+  de <span class="math">t</span>) <!-- {li:.bullet style="max-width: 720px"} -->
 
 ---
-<!-- {"layout": "centered"} -->
+<!-- {"layout": "regular-centered"} -->
 # Interpretando a interseção com esfera
 
 - Seja <span class="math">\Delta = b^2 - 4ac</span>
   - Então:<br><div class="math">t = \frac{-b \pm \sqrt(\Delta)}{2a}</div> <!-- {ul^1:.no-margin.no-padding.full-width.layout-split-2 style="justify-content: space-around; align-items: center;"} -->
-- ![](../../images/raytracing-raio-esfera.png) <!-- {li:.no-bullet} -->
+- ![](../../images/raytracing-raio-esfera.svg) <!-- {li:.no-bullet} -->
 
 Ou seja, para descobrir se o raio interceptou a esfera, **basta resolver
   uma equação de 2º grau** ;)
 
 ---
-<!-- {"layout": "regular"} -->
-# Para **esferas genéricas** (1/4)
+<!-- {"layout": "regular", "slideClass": "esferas-genericas-1", "embeddedStyles": ".esferas-genericas-1 .katex-display { margin-block: 0.6em; }"} -->
+# Para **esferas genéricas** (1/4) <!-- {.bullet} -->
 
-- Dada uma esfera com centro <span class="math">C</span> e raio <span class="math">r</span>
-  - Nosso raio: <span class="math">P+t\vec{u}</span>
-- Um ponto <span class="math">Q</span> está superfície da esfera se sua distância até o centro é igual a <span class="math">r</span>. Ou seja, <span class="math">\left| Q-C \right|=r</span>. Substituindo, temos:
-  <div class="math">\left| (P+t\vec{u})-C \right|=r</div>
-- ::: result .note.info width: 320px; position: absolute; right: 0;
+- <!-- {ul:.full-width} -->
+  Dada uma esfera com centro <span class="math">\textcolor{#5a5ad8}{C}</span> e raio <span class="math">\textcolor{#5a5ad8}{r}</span>
+  - Nosso raio: <span class="math">\textcolor{#5a5ad8}{P_0}+\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}</span>
+- Um ponto <span class="math">\textcolor{#e8691c}{Q}</span> está superfície da esfera se sua distância até o centro é igual a <span class="math">\textcolor{#5a5ad8}{r}</span>.<br>Ou seja, <span class="math">\lVert \textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{C} \rVert=\textcolor{#5a5ad8}{r}</span>. Substituindo o raio no ponto <span class="math">\textcolor{#e8691c}{Q}</span>, temos:
+  <div class="math">\lVert (\textcolor{#5a5ad8}{P_0}+\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}})-\textcolor{#5a5ad8}{C} \rVert=\textcolor{#5a5ad8}{r}</div>
+- <!-- {li:.no-bullet} -->
+  <div class="math">\lVert \textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-(\textcolor{#5a5ad8}{C}-\textcolor{#5a5ad8}{P_0})\rVert=\textcolor{#5a5ad8}{r}</div>
+- <!-- {li:.bullet.full-width} -->
+  ::: result .note.info.bullet width: 320px; position: absolute; right: 1rem;
   Se elevarmos a equação ao quadrado:
-  <div class="math">\left| \vec{v} \right|^2=\vec{v}\cdot\vec{v}</div>
+  <div class="math">\lVert \vec{v} \rVert^2=\vec{v}\cdot\vec{v}</div>
   ::: 
-  Para facilitar a álgebra criamos <span class="math">\vec{p}=C-P</span>:
-  <div class="math">\left| t\vec{u}-(C-P)\right|=r</div>
-  <div class="math">\left| t\vec{u}-\vec{p} \right|=r</div>
+  Para facilitar a álgebra criamos <span class="math">\textcolor{#5a5ad8}{\vec{p}}=\textcolor{#5a5ad8}{C}-\textcolor{#5a5ad8}{P_0}</span>:
+  <div class="math">\lVert \textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{\vec{p}} \rVert=\textcolor{#5a5ad8}{r}</div>
+  <div class="math">\lVert \textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{\vec{p}} \rVert^2=\textcolor{#5a5ad8}{r}^2</div>
 
 ---
 <!-- {"layout": "regular"} -->
 # Para **esferas genéricas** (2/4)
 
-- Conhecemos <span class="math">\vec{u}, \vec{p}</span> e <span class="math">r</span> e queremos encontrar <span class="math">t</span>. Pelo produto interno: <!-- {ul:.bulleted} -->
-  <div class="math">(t\vec{u}-\vec{p})\cdot(t\vec{u}-\vec{p})=r^2</div>
-- Sabendo que o lado esquerdo resulta em um escalar, podemos:
-  <div class="math">t^2(\vec{u}\cdot\vec{u})-2t(\vec{u}\cdot\vec{p})+(\vec{p}\cdot\vec{p})-r^2=0</div>
-- ...que é uma equação do 2º grau e podemos resolver para <span class="math">t</span>, afinal:
-  - <span class="math">\vec{u}</span> é conhecido
-  - <span class="math">\vec{p} = C-P</span> é conhecido
-  - <span class="math">r</span> é conhecido
-  - <span class="math">t</span> é a variável
+- Conhecemos <span class="math">\textcolor{#5a5ad8}{\textcolor{#5a5ad8}{\vec{u}}}, \textcolor{#5a5ad8}{\vec{p}}</span> e <span class="math">\textcolor{#5a5ad8}{r}</span> e queremos encontrar <span class="math">\textcolor{#e8691c}{t}</span>. Pelo produto interno: <!-- {ul:.bulleted} -->
+  <div class="math">(\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{\vec{p}})\cdot(\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{\vec{p}})=\textcolor{#5a5ad8}{r}^2</div>
+- Sabendo que o lado esquerdo resulta em um escalar, podemos distribuir e isolar <span class="math">\textcolor{#e8691c}{t}</span>:
+  <div class="math">\textcolor{#e8691c}{t}^2(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{u}})-2\textcolor{#e8691c}{t}(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{p}})+(\textcolor{#5a5ad8}{\vec{p}}\cdot\textcolor{#5a5ad8}{\vec{p}})-\textcolor{#5a5ad8}{r}^2=0</div>
+- ...que é uma equação do 2º grau e podemos resolver para <span class="math">\textcolor{#e8691c}{t}</span>, afinal:
+  - <span class="math">\textcolor{#5a5ad8}{\vec{u}}</span> é conhecido
+  - <span class="math">\textcolor{#5a5ad8}{\vec{p}} = \textcolor{#5a5ad8}{C}-\textcolor{#5a5ad8}{P_0}</span> é conhecido
+  - <span class="math">\textcolor{#5a5ad8}{r}</span> é conhecido
+  - <span class="math">\textcolor{#e8691c}{t}</span> é a variável
 
 ---
 <!-- {"layout": "regular", "state": "show-active-slide-and-previous"} -->
@@ -362,14 +386,14 @@ Ou seja, para descobrir se o raio interceptou a esfera, **basta resolver
 
 - Da equação quadrática, temos que: <!-- {ul:.bullet style="width: 62%; margin-left: 25%; clear: right;"} -->
   <ul>
-    <li><span class="math">a = (\vec{u}.\vec{u})=1</span> (já que <span class="math">\vec{u}</span> está normalizado)</li>
-    <li><span class="math">b = -2(\vec{u}.\vec{p})</span></li>
-    <li><span class="math">c = (\vec{p}.\vec{p})-r^2</span></li>
+    <li><span class="math">a = (\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{u}})=1</span> (se <span class="math">\vec{u}</span> estiver normalizado)</li>
+    <li><span class="math">b = -2(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{p}})</span></li>
+    <li><span class="math">c = (\textcolor{#5a5ad8}{\vec{p}}\cdot\textcolor{#5a5ad8}{\vec{p}})-\textcolor{#5a5ad8}{r}^2</span></li>
   </ul>
 - Disto, podemos **estudar o sinal do <span class="math">\Delta</span>** para
   saber se há interseção(ões) (raiz(es)) e, caso exista(m), com o
-  valor encontrado para <span class="math">t</span> podemos **determinar
-  o ponto de interseção <span class="math">Q</span>** na esfera
+  valor encontrado para <span class="math">\textcolor{#e8691c}{t}</span> podemos **determinar
+  o ponto de interseção <span class="math">\textcolor{#e8691c}{Q}</span>** na esfera
 
 Esta é a fórmula que deve ser usada, porque serve para esferas posicionadas em qualquer lugar e com qualquer tamanho. <!-- {p:.note.info.bullet style="max-width: 75%;margin-left:17%;"} -->
 
@@ -396,79 +420,75 @@ Casa haja dois valores positivos diferentes, pegamos o menor (que será <span cl
 # Outras informações da colisão
 
 - Além de determinar se houve colisão ou não, também é necessário descobrir:
-  - O ponto de interseção <span class="math">Q=P+t\vec{u} \quad</span> <small style="color: gray">(usando o <span class="math">t</span> encontrado na equação do raio)</small>
+  - O ponto de interseção <span class="math">\textcolor{#e8691c}{Q}=\textcolor{#5a5ad8}{P_0}+\textcolor{#5a5ad8}{t\vec{u}} \quad</span> <small style="color: gray">(usando o <span class="math">\textcolor{#5a5ad8}{t}</span> encontrado na equação do raio)</small>
   - O vetor normal do objeto nesse ponto
-- ![](../../images/raytracing-raio-esfera-normal.png) <!-- {.push-right style="max-width: 450px"} -->
-  A normal no ponto de interseção <span class="math">P</span> é
-  dada pelo gradiente no ponto de interseção:
-- No caso da esfera, **podemos simplesmente** fazer o vetor<div style="display: flex; justify-content: center;"><div class="math bullet">\vec{n}=P-C,</div><div class="math bullet">\quad \hat{n}=\frac{\vec{n}}{\left|\vec{n}\right|}</div></div>
+- ::: figure .push-right.bullet max-width: 550px; display: flex; flex-direction: row; gap: 1rem;
+  ![](../../images/raytracing-raio-esfera-normal.svg)
+  
+  <div class="math">\vec{n}=\begin{bmatrix}\frac{\partial F}{\partial x} \\[5pt] \frac{\partial F}{\partial y} \\[5pt] \frac{\partial F}{\partial z}\end{bmatrix}=\begin{bmatrix}2(x-C_x)\\[5pt]2(y-C_y)\\[5pt]2(z-C_z)\end{bmatrix}</div>
+  :::
+  A normal no ponto de interseção <span class="math">Q</span> é
+  dada pelo gradiente no ponto de interseção ➡️
+- <!-- {li:.bullet} -->
+  No caso da esfera, **podemos simplesmente** fazer o vetor<div style="display: flex; justify-content: center;"><div class="math">\vec{n}=Q-C,</div><div class="math bullet">\quad \hat{n}=\frac{\vec{n}}{\left|\vec{n}\right|}</div></div>
   <div class="bullet">onde <span class="math">C</span> é o centro da esfera.</div>
 
 ---
 <!-- {"layout": "regular"} -->
 # Implementando um _ray tracer_
 
+![](../../images/raytracer-input-output.svg) <!-- {p:.no-margin.full-width.center-aligned} -->
+
 - Precisamos de
-  1. Uma classe **Vetor**
-  1. Uma classe **ObjetoDaCena**
+  1. Utilitário para **Ponto** ou **Vetor**
+  1. Uma classe **ObjetoDaCena** com subclasses para cada tipo de sólido
   1. Uma estrutura/classe **FonteDeLuz**
-  1. Uma estrutura/classe **Raio**
+  1. Uma estrutura/classe **Raio**, e outra para **RespostaColisão**
   1. E mais algumas coisinhas...
-- **Não precisamos** de:
-  - Do **OpenGL ou do DirectX**, já que não conseguimos usar a placa de vídeo para estes cálculos
-    - Na verdade essa é uma área de pesquisa recente
+- **Não precisamos** <!-- {.alternate-color} --> de:
+  - De **OpenGL, WebGL ou DirectX** <!-- {.alternate-color} -->, afinal são APIs de rasterização
+
 
 ---
-## Um programa _raytracer_
+<!-- {"layout": "regular"} -->
+## Entrada e saída
 
-![](../../images/raytracer-input-output.svg)
+- <!-- {ul:.layout-split-2.no-bullet style="gap: 3rem"} -->
+  Descrição da cena:
+  <img src="../../images/raytracer-input-file.svg" style="width: 500px">
 
----
-## Entrada
-
-- Descrição da cena
-
-![](../../images/raytracer-input-file.png)
-
----
-## Saída
-
-- Arquivo da imagem renderizada (formato .ppm)
-
-![](../../images/raytracer-output-file.png)
-
----
-<!-- {"backdrop": "cpp-vs-java"} -->
-
-# _Choose your side_ <!-- {style="margin-bottom: 4em; font-weight: bold;"} -->
+- Saída gerada:
+  <img src="../../images/raytracer-output-file.png" style="border-radius: 10px; box-shadow: 0px 0px 11px 2px #00000073">
 
 ---
 # Para a próxima aula
 
-- Ler as aulas 18 e 19 do prof. David Mount (link no Moodle)
-  - Fazer isto = certeza de sucesso, TP resolvido durante a aula
-  - Não fazer = TPs incompletos, trabalho no final de semana :/
+- Ler páginas 79, 80 (introdução a raytracing), 83 (representação de raio), 85 e 86 do prof. David Mount
+  - Fazer isto => certeza de sucesso, TP resolvido durante a aula
+  - Não fazer => TPs incompletos ou mesmo não consegue entregar :/
+- Opcional:
+  - Colisão de raio com triângulo (páginas 109-112)
 
 ---
 <!-- { "layout": "regular" } -->
 # Colisão com plano
 
 - ![](../../images/colisao-raio-plano.svg) <!-- {.push-right style="max-width: 240px"} --> <!-- {ul:.bulleted style="max-width: 80%"} -->
-  Seja <span class="math">C</span> um ponto qualquer no plano e <span class="math">\vec{n}</span> a normal do plano
-- Um ponto <span class="math">Q</span> está no plano se o vetor <span class="math">Q-C</span> for perpendicular a <span class="math">\vec{n}</span>. Ou seja:
-  <div class="math">(Q-C)\cdot\vec{n}=0</div>
-- Substituindo <span class="math">Q</span> pela equação do raio:
+  Seja <span class="math">\textcolor{#5a5ad8}{C}</span> um ponto qualquer no plano e <span class="math">\textcolor{#5a5ad8}{\vec{n}}</span> a normal do plano
+- Um ponto <span class="math">\textcolor{#e8691c}{Q}</span> está no plano se o vetor <span class="math">\textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{C}</span> for perpendicular a <span class="math">\textcolor{#5a5ad8}{\vec{n}}</span>. Ou seja:
+  <div class="math">(\textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{C})\cdot\textcolor{#5a5ad8}{\vec{n}}=0</div>
+- Substituindo <span class="math">\textcolor{#e8691c}{Q}</span> pela equação do raio:
   <div class="full-width" style="display: grid; grid-template-rows: auto auto auto auto; grid-template-columns: auto 1fr; grid-column-gap: 1em;">
     <div style="display: flex; justify-content: flex-start; grid-row: 1/2; grid-column: 1/2">
-      <span class="math bullet">(P+t\vec{u}-C)\cdot\vec{n}=0</span>
-      <span class="math bullet">\textrm{,} \quad \vec{p}=C-P</span>
+      <span class="math bullet">(\textcolor{#5a5ad8}{P_0}+\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{C})\cdot\textcolor{#5a5ad8}{\vec{n}}=0</span>
+      <span class="math bullet">\textrm{,} \quad \textcolor{#5a5ad8}{\vec{p}}=\textcolor{#5a5ad8}{C}-\textcolor{#5a5ad8}{P_0}</span>
     </div>
     <small class="bullet" style="color: gray; grid-row: 1/2; grid-column: 2/3">⬅️ fazendo um truque algébrico</small>
-    <span class="math bullet" style="grid-row: 2/3; grid-column: 1/2">(t\vec{u}-\vec{p})\cdot\vec{n}=0</span>
-    <small class="bullet" style="color: gray; grid-row: 2/3; grid-column: 2/3">⬅️ distribuindo o produto escalar</small>
-    <span class="math bullet" style="grid-row: 3/4; grid-column: 1/2">t(\vec{u}\cdot\vec{n})-\vec{p}\cdot\vec{n}=0</span>
-    <small class="bullet" style="color: gray; grid-row: 3/4; grid-column: 2/3">⬅️ isolando <span class="math">t</span></small>
-    <div class="math bullet no-margin left-aligned" style="grid-row: 4/5; grid-column: 1/2;">t=\frac{\vec{p}\cdot\vec{n}}{\vec{u}\cdot\vec{n}}</div>
+    <span class="math bullet" style="grid-row: 2/3; grid-column: 1/2">(\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{\vec{p}})\cdot\textcolor{#5a5ad8}{\vec{n}}=0</span>
+    <small class="bullet" style="color: gray; grid-row: 2/3; grid-column: 2/3">↙️ distribuindo o produto escalar</small>
+    <span class="math bullet" style="grid-row: 3/4; grid-column: 1/2">\textcolor{#e8691c}{t}(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{n}})-\textcolor{#5a5ad8}{\vec{p}}\cdot\textcolor{#5a5ad8}{\vec{n}}=0</span>
+    <small class="bullet" style="color: gray; grid-row: 3/4; grid-column: 2/3">↙️ isolando <span class="math">\textcolor{#e8691c}{t}</span></small>
+    <div class="math bullet no-margin centered" style="grid-row: 4/5; grid-column: 1/2;">\textcolor{#e8691c}{t}=\frac{\textcolor{#5a5ad8}{\vec{p}}\cdot\textcolor{#5a5ad8}{\vec{n}}}{\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{n}}}</div>
   </div>
 
 ---
@@ -494,57 +514,57 @@ Casa haja dois valores positivos diferentes, pegamos o menor (que será <span cl
 # Colisão com cilindro
 
 - ![](../../images/colisao-raio-cilindro.svg) <!-- {.push-right style="max-width: 240px"} --> <!-- {ul:.bulleted style="max-width: 80%"} -->
-  Sejam <span class="math">B</span> e <span class="math">T</span> o centro da base e topo do cilindro e <span class="math">r</span> o seu raio
-- Um ponto <span class="math">Q</span> está na lateral do cilindro se: <span class="math">\lVert Q-B\rVert^2=\lVert K-B\rVert^2+r^2</span>
-- Precisamos descobrir <span class="math">K</span> em termos do que temos. Considere:
-  - O vetor direção do cilindro: <span class="math">\hat{h}=\frac{T-B}{\lVert T-B\rVert}</span>
-  - Projetando <span class="math">\overline{QB}</span> em <span class="math">\hat{h}</span>, <span class="math">\lVert K-B\rVert=(Q-B) \cdot \hat{h}</span>
+  Sejam <span class="math">\textcolor{#5a5ad8}{B}</span> e <span class="math">\textcolor{#5a5ad8}{T}</span> o centro da <u>b</u>ase e <u>t</u>opo do cilindro e <span class="math">\textcolor{#5a5ad8}{r}</span> o seu raio
+- Um ponto <span class="math">\textcolor{#e8691c}{Q}</span> está na lateral do cilindro se: <span class="math">\lVert \textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{B}\rVert^2=\lVert \textcolor{#5a5ad8}{K}-\textcolor{#5a5ad8}{B}\rVert^2+\textcolor{#5a5ad8}{r}^2</span>
+- Precisamos descobrir <span class="math">\textcolor{#5a5ad8}{K}</span> em termos do que temos. Considere:
+  - O vetor direção do cilindro: <span class="math">\textcolor{#5a5ad8}{\hat{h}}=\frac{\textcolor{#5a5ad8}{T}-\textcolor{#5a5ad8}{B}}{\lVert \textcolor{#5a5ad8}{T}-\textcolor{#5a5ad8}{B}\rVert}</span>
+  - Projetando <span class="math">\textcolor{#e8691c}{\overline{QB}}</span> em <span class="math">\textcolor{#5a5ad8}{\hat{h}}</span>, <span class="math">\lVert \textcolor{#5a5ad8}{K}-\textcolor{#5a5ad8}{B}\rVert=(\textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{B}) \cdot \textcolor{#5a5ad8}{\hat{h}}</span>
 - Vamos agora:
-  - (a) substituir <span class="math">\lVert K-B\rVert</span> na equação do cilindro
-  - (b) substituir <span class="math">Q</span> pela equação do raio...
+  - (a) substituir <span class="math">\lVert \textcolor{#5a5ad8}{K}-\textcolor{#5a5ad8}{B}\rVert</span> na equação do cilindro
+  - (b) depois, substituir <span class="math">\textcolor{#e8691c}{Q}</span> pela equação do raio...
 
 ---
 <!-- {"layout": "centered"} -->
 
 - ![](../../images/colisao-raio-cilindro.svg) <!-- {ul:.layout-split-2.no-bullet style="gap: 1rem; margin-bottom: 0; flex: 0;"} -->
 - <div class="full-width bullet" style="display: grid; grid-auto-rows: auto; grid-template-columns: auto 1fr; grid-column-gap: 1em;">
-    <span class="math">\lVert Q-B\rVert^2=\lVert K-B\rVert^2+r^2</span>
+    <span class="math">\lVert \textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{B}\rVert^2=\lVert \textcolor{#5a5ad8}{K}-\textcolor{#5a5ad8}{B}\rVert^2+\textcolor{#5a5ad8}{r}^2</span>
     <small style="color: gray; grid-row: 1/2; grid-column: 2/3">(0) Equação do cilindro</small>
-    <span class="math">\lVert K-B\rVert=(Q-B) \cdot \hat{h}</span>
-    <small style="color: gray; grid-row: 2/3; grid-column: 2/3">(a) Tamanho do segmento <span class="math">K-B</span></small>
-    <span class="math">P+\textcolor{blue}{t}\vec{u}</span>
-    <small style="color: gray; grid-row: 3/4; grid-column: 2/3">(b) Equação do raio, vai substituir <span class="math">Q</span></small>
+    <span class="math">\lVert \textcolor{#5a5ad8}{K}-\textcolor{#5a5ad8}{B}\rVert=(\textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{B}) \cdot \textcolor{#5a5ad8}{\hat{h}}</span>
+    <small style="color: gray; grid-row: 2/3; grid-column: 2/3">(a) Tamanho do segmento <span class="math">\textcolor{#5a5ad8}{K}-\textcolor{#5a5ad8}{B}</span></small>
+    <span class="math">\textcolor{#5a5ad8}{P_0}+\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}</span>
+    <small style="color: gray; grid-row: 3/4; grid-column: 2/3">(b) Equação do raio, vai substituir <span class="math">\textcolor{#e8691c}{Q}</span></small>
   </div>
   <ul class="no-padding" style="margin-top: 1rem;">
     <li class="bullet">Substituindo (a) em (0):<br>
-      <span class="math" style="margin-left: 1rem">\lVert Q-B\rVert^2=[(Q-B) \cdot \hat{h}]^2+r^2</span>
+      <span class="math" style="margin-left: 1rem">\lVert \textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{B}\rVert^2=[(\textcolor{#e8691c}{Q}-\textcolor{#5a5ad8}{B}) \cdot \textcolor{#5a5ad8}{\hat{h}}]^2+\textcolor{#5a5ad8}{r}^2</span>
     </li>
-    <li class="bullet">Substituindo (b) em <span class="math">Q</span>:<br>
-      <span class="math" style="margin-left: 1rem">\lVert P+\textcolor{blue}{t}\vec{u}-B\rVert^2=[(P+\textcolor{blue}{t}\vec{u}-B) \cdot \hat{h}]^2+r^2</span>
+    <li class="bullet">Substituindo (b) em <span class="math">\textcolor{#e8691c}{Q}</span>:<br>
+      <span class="math" style="margin-left: 1rem">\lVert \textcolor{#5a5ad8}{P_0}+\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{B}\rVert^2=[(\textcolor{#5a5ad8}{P_0}+\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}-\textcolor{#5a5ad8}{B}) \cdot \textcolor{#5a5ad8}{\hat{h}}]^2+\textcolor{#5a5ad8}{r}^2</span>
     </li>
   </ul>
 
 1. <!-- {ol:.no-bullet.no-padding.bullet.no-margin} -->
    Resolvendo:
    <div class="full-width" style="display: grid; grid-auto-rows: auto; grid-template-columns: auto 1fr; grid-column-gap: 1em;">
-     <span class="math bullet">\vec{w}=P-B</span>
+     <span class="math bullet">\textcolor{#5a5ad8}{\vec{w}}=\textcolor{#5a5ad8}{P_0}-\textcolor{#5a5ad8}{B}</span>
      <small class="bullet" style="color: gray; grid-row: 1/2; grid-column: 2/3">⬅️ fazendo um truque algébrico</small>
      <span class="math bullet" style="grid-row: 2/3; grid-column: 1/2">
-       \lVert\textcolor{blue}{t}\vec{u}+\vec{w}\rVert^2-[(\textcolor{blue}{t}\vec{u}+\vec{w})\cdot\hat{h}]^2=r^2
+       \lVert\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}+\textcolor{#5a5ad8}{\vec{w}}\rVert^2-[(\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}+\textcolor{#5a5ad8}{\vec{w}})\cdot\textcolor{#5a5ad8}{\hat{h}}]^2=\textcolor{#5a5ad8}{r}^2
      </span>
-     <small class="bullet" style="color: gray; grid-row: 2/3; grid-column: 2/3">⬅️ norma² == p. escalar</small>
+     <small class="bullet" style="color: gray; grid-row: 2/3; grid-column: 2/3">↙️ norma² == p. escalar</small>
      <span class="math bullet" style="grid-row: 3/4; grid-column: 1/2">
-       (\textcolor{blue}{t}\vec{u}+\vec{w})\cdot(\textcolor{blue}{t}\vec{u}+\vec{w})-[(\vec{u}\cdot\hat{h})\textcolor{blue}{t}+(\vec{w}\cdot\hat{h})]^2=r^2
+       (\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}+\textcolor{#5a5ad8}{\vec{w}})\cdot(\textcolor{#e8691c}{t}\textcolor{#5a5ad8}{\vec{u}}+\textcolor{#5a5ad8}{\vec{w}})-[(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\hat{h}})\textcolor{#e8691c}{t}+(\textcolor{#5a5ad8}{\vec{w}}\cdot\textcolor{#5a5ad8}{\hat{h}})]^2=\textcolor{#5a5ad8}{r}^2
      </span>
-     <small class="bullet" style="color: gray; grid-row: 3/4; grid-column: 2/3">⬅️ expandindo p. escalar e ²</small>
+     <small class="bullet" style="color: gray; grid-row: 3/4; grid-column: 2/3">↙️ expandindo p. escalar e ²</small>
      <span class="math bullet no-margin left-aligned" style="grid-row: 4/5; grid-column: 1/3;">
-        (\vec{u}\cdot\vec{u})\textcolor{blue}{t}^2+2(\vec{u}\cdot\vec{w})\textcolor{blue}{t}+(\vec{w}\cdot\vec{w})-(\vec{u}\cdot\hat{h})^2\textcolor{blue}{t}^2-2(\vec{u}  \cdot\hat{h})(\vec{w}\cdot\hat{h})\textcolor{blue}{t}-(\vec{w}\cdot\hat{h})^2=r^2
+        (\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{u}})\textcolor{#e8691c}{t}^2+2(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{w}})\textcolor{#e8691c}{t}+(\textcolor{#5a5ad8}{\vec{w}}\cdot\textcolor{#5a5ad8}{\vec{w}})-(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\hat{h}})^2\textcolor{#e8691c}{t}^2-2(\textcolor{#5a5ad8}{\vec{u}}  \cdot\textcolor{#5a5ad8}{\hat{h}})(\textcolor{#5a5ad8}{\vec{w}}\cdot\textcolor{#5a5ad8}{\hat{h}})\textcolor{#e8691c}{t}-(\textcolor{#5a5ad8}{\vec{w}}\cdot\textcolor{#5a5ad8}{\hat{h}})^2=\textcolor{#5a5ad8}{r}^2
      </span>
    </div>
    <li class="bullet">
-    Agrupando por coeficientes de potência de <span class="math">\textcolor{blue}{t}</span>:<br>
+    Agrupando por coeficientes de potência de <span class="math">\textcolor{#e8691c}{t}</span>:<br>
      <span class="math bullet no-margin left-aligned" style="grid-row: 4/5; grid-column: 1/3;">
-        [(\vec{u}\cdot\vec{u})-(\vec{u}\cdot\hat{h})^2]\textcolor{blue}{t}^2+2[(\vec{u}\cdot\vec{w})-(\vec{u}\cdot\hat{h})(\vec{w}\cdot\hat{h})]\textcolor{blue}{t}+(\vec{w}\cdot\vec{w})-(\vec{w}\cdot\hat{h})^2-r^2=0
+        [(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{u}})-(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\hat{h}})^2]\textcolor{#e8691c}{t}^2+2[(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\vec{w}})-(\textcolor{#5a5ad8}{\vec{u}}\cdot\textcolor{#5a5ad8}{\hat{h}})(\textcolor{#5a5ad8}{\vec{w}}\cdot\textcolor{#5a5ad8}{\hat{h}})]\textcolor{#e8691c}{t}+(\textcolor{#5a5ad8}{\vec{w}}\cdot\textcolor{#5a5ad8}{\vec{w}})-(\textcolor{#5a5ad8}{\vec{w}}\cdot\textcolor{#5a5ad8}{\hat{h}})^2-\textcolor{#5a5ad8}{r}^2=0
      </span>
    </li>
 
@@ -552,7 +572,7 @@ Casa haja dois valores positivos diferentes, pegamos o menor (que será <span cl
 <!-- {"layout": "center", "state": "show-active-slide-and-previous"} -->
 
 - <!-- {ul:.bullet.no-margin} -->
-  Se resolvermos a equação de 2º grau para <span class="math">\textcolor{blue}{t}</span>:
+  Se resolvermos a equação de 2º grau para <span class="math">\textcolor{#e8691c}{t}</span>:
   <div class="math">
   \begin{cases}
     a=(\vec{u}\cdot\vec{u}) - ( \vec{u} \cdot \hat{h})^2 \\
@@ -576,7 +596,38 @@ Além disso, precisamos considerar o ínicio e fim do cilindro:
 </div>
 
 ---
-# [Colisão com triângulo](https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution)
+<!-- {"layout": "regular"} -->
+# Colisão com triângulo
+
+Feita em 2 passos:
+1. Verifica se colidiu com o plano, e salva o ponto <span class="math">Q</span>
+1. Testa se <span class="math">Q</span> está dentro/fora de cada lado do triângulo
+
+- <!-- {ul:.full-width} -->
+  <!-- {li:.no-bullet} -->
+  <figure class="picture-steps clean push-left" style="font-size: 0.8em">
+    <img src="../../images/colisao-raio-triangulo-1.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-2.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-3.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-4.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-5.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-6.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-7.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-8.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-9.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-10.svg" class="bullet"> 
+    <img src="../../images/colisao-raio-triangulo-11.svg" class="bullet"> 
+  </figure>
+  
+  1. Para o lado <span class="math">\overline{AB}</span>:
+  1. a) Acha o vetor <span class="math">\overline{AQ}</span>
+  1. b) Produto vetorial do lado <span class="math">\overline{AB}</span> com <span class="math">\overline{AQ}</span>: <span class="math">\overline{AB}\times\overline{AQ}</span>)
+  1. c) Vê se aponta para mesmo lado que a normal <span class="math">\vec{n}</span> estudando o sinal de <span class="math">(\overline{AB}\times\overline{AQ})\cdot\vec{n}</span>
+  1. d) Faz o mesmo para lados <span class="math">\overline{BC}</span> e <span class="math">\overline{CA}</span>
+
+
+
+<!-- (https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution) -->
 
 
 ---
