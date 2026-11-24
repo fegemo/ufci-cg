@@ -17,6 +17,14 @@ Após ler este enunciado geral do TP3, **leia também o enunciado** da
 [enunciado-colisao]: collision/README.md
 [enunciado-sombreamento]: shading/README.md
 
+## Code Walkthrough (10+3min)
+
+Tem um **vídeo explicando o código** (10 min):
+[vídeo no YouTube](https://youtu.be/SZqSgPjR-So?is=HXbraHJDtU9JWeOv).
+
+E outro mostrando como executar os **testes que o professor ou monitor executará para corrigir** (3min):
+[vídeo no YouTube](https://youtu.be/KUMgZl1TuhY?is=p-I6DZISZK7kkNFD).
+
 
 ## Funcionamento do Programa
 
@@ -194,9 +202,7 @@ Você deve entregar no sistema acadêmico um **arquivo compactado contendo**:
    que já estão no lugar certo)
 1. O executável gerado automaticamente ao compilar/executar
 
-O trabalho básico deve ser durante a aula (professor dará "visto") 
-e itens opcionais podem ser entregues 
-**até imediatamente <u>antes da próxima aula</u> da matéria**.
+O trabalho deve ser feito **durante a aula (professor dará "visto")**. Entregue pelo sistema acadêmico.
 
 
 
